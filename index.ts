@@ -504,17 +504,17 @@ export const createParseFunction = <Context>(options: Options<Context>): Parse<C
 };
 
 /**
- * onError handler for error on comment parsing.
+ * onError callback handler for error on comment parsing.
  */
 export type OnCommentError<Context> = Callback<Context, [open: ParsedToken]>;
 
 /**
- * onParse handler of comment.
+ * onParse callback handler of comment.
  */
 export type OnCommentParse<Context> = Callback<Context, CommentPair>;
 
 /**
- * onParse handler of statement with concrete length (number of tokens).
+ * onParse callback handler of statement with concrete length (number of tokens).
  */
 export type OnParse<Context = any, Length extends keyof AllLength | 0 = 0> = Callback<
   Context,
