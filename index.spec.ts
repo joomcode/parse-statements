@@ -55,14 +55,29 @@ const onCommentError: OnCommentError<Context> = (_context, source, {start}) => {
   throwError(source.slice(start));
 };
 
-const onCommentParse: OnCommentParse<Context> = ({singlelineComments}, source, {end}, {start}) => {
-  singlelineComments.push(source.slice(end, start));
+const onCommentParse: OnCommentParse<Context> = (
+  {singlelineComments},
+  source,
+  openToken,
+  closeToken,
+) => {
+  assert(
+    Array.isArray(openToken.match) && Array.isArray(closeToken.match),
+    'comments tokens has "match"',
+  );
+
+  singlelineComments.push(source.slice(openToken.end, closeToken.start));
 };
 
 const onError: OnParse<Context> = ({errors}, source, ...tokens) => {
   const lastToken = tokens[tokens.length - 1]!;
 
   errors.push(source.slice(tokens[0]!.start, lastToken.end + 30));
+
+  assert(
+    tokens.every((token) => Array.isArray(token.match)),
+    'errors tokens has "match"',
+  );
 
   if ('comments' in lastToken) {
     const comments = lastToken.comments.map((pair) => getCommentSource(source, pair));
@@ -76,38 +91,30 @@ const getCommentSource = (
   pair: readonly [{end: number}, {start: number}],
 ): string => source.slice(pair[0].end, pair[1].start);
 
-const onExportParse: OnParse<Context, 3> = (
-  {exports},
-  source,
-  exportStart,
-  exportListEnd,
-  exportEnd,
-) => {
+const onExportParse: OnParse<Context, 2> = ({exports}, source, exportStart, exportEnd) => {
   const exportStartComments = exportStart.comments?.map((pair) => getCommentSource(source, pair));
-  const exportListComments = exportListEnd.comments?.map((pair) => getCommentSource(source, pair));
 
-  exports.push([
-    source.slice(exportStart.end, exportEnd.start),
-    ...(exportStartComments || []),
-    ...(exportListComments || []),
-  ]);
+  assert(
+    Array.isArray(exportStart.match) && Array.isArray(exportEnd.match),
+    'exports tokens has "match"',
+  );
+
+  if (exportEnd.match.groups?.['constName']) {
+    assert(exportEnd.match.groups['constName'] === 'qux', 'produce correct groups from match');
+  }
+
+  exports.push([source.slice(exportStart.end, exportEnd.start), ...(exportStartComments || [])]);
 };
 
-const onImportParse: OnParse<Context, 3> = (
-  {imports},
-  source,
-  importStart,
-  importFrom,
-  importEnd,
-) => {
+const onImportParse: OnParse<Context, 3> = ({imports}, source, importStart, importEnd) => {
   const importStartComments = importStart.comments?.map((pair) => getCommentSource(source, pair));
-  const importFromComments = importFrom.comments?.map((pair) => getCommentSource(source, pair));
 
-  imports.push([
-    source.slice(importStart.end, importEnd.start),
-    ...(importStartComments || []),
-    ...(importFromComments || []),
-  ]);
+  assert(
+    Array.isArray(importStart.match) && Array.isArray(importEnd.match),
+    'imports tokens has "match"',
+  );
+
+  imports.push([source.slice(importStart.end, importEnd.start), ...(importStartComments || [])]);
 };
 
 const parseImportsExports = createParseFunction<Context>({
@@ -130,12 +137,15 @@ const parseImportsExports = createParseFunction<Context>({
     {
       onError,
       onParse: onImportParse as OnParse,
-      tokens: ['^import\\b', '\\bfrom\\b', '$\\n?'],
+      tokens: ['^import ', '("[^"]*";?$\\n?)|(\'[^\']*\';?$\\n?)'],
     },
     {
       onError,
       onParse: onExportParse as OnParse,
-      tokens: ['^export\\b', '\\}', '$\\n?'],
+      tokens: [
+        '^export ',
+        '(\\bconst (?<constName>[\\w_$][\\w_$\\d]*)\\b)|("[^"]*";?$\\n?)|(\'[^\']*\';?$\\n?)',
+      ],
     },
   ],
 });
@@ -162,16 +172,17 @@ import /* some comment */ bar from bar;
 
 import bar from './baz'
 
+export {foo} /* also comment} */ from 'baz';
+export const qux = 2;
+export /* comment in export} */ {bar} from "bar";
+
 import with error;
 import // comment in import without from;
-
-export {foo} /* also comment} */;
-export /* comment in export} */ {bar}
 `,
 );
 
 assert(importsExports.errors.length === 2, 'creates errors');
-assert(importsExports.exports.length === 2, 'parse exports');
+assert(importsExports.exports.length === 3, 'parse exports');
 assert(importsExports.imports.length === 4, 'parse imports');
 assert(importsExports.singlelineComments.length === 2, 'parse singleline comments');
 assert(importsExports.multilineComments.length === 3, 'parse multiline comments');

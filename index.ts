@@ -98,7 +98,7 @@ type Parse<Context> = Callback<Context, []>;
 /**
  * The result of parsing the token.
  */
-type ParsedToken = Readonly<{start: number; end: number; token: string}>;
+type ParsedToken = Readonly<{start: number; end: number; match: RegExpExecArray; token: string}>;
 
 /**
  * The result of parsing the statement.
@@ -308,6 +308,7 @@ export const createParseFunction = <Context>(options: Options<Context>): Parse<C
         let lastParsedToken: Mutable<ParsedTokenWithComments> = {
           start: nextStatementMatch.index,
           end: index,
+          match: nextStatementMatch,
           token,
         };
         parsedTokens.push(lastParsedToken);
@@ -348,7 +349,12 @@ export const createParseFunction = <Context>(options: Options<Context>): Parse<C
 
             if (nextToken !== undefined) {
               index = nextTokenRegexp.lastIndex;
-              lastParsedToken = {start: nextTokenMatch.index, end: index, token: nextToken};
+              lastParsedToken = {
+                start: nextTokenMatch.index,
+                end: index,
+                match: nextTokenMatch,
+                token: nextToken,
+              };
               parsedTokens.push(lastParsedToken);
 
               break findNextToken;
@@ -396,6 +402,7 @@ export const createParseFunction = <Context>(options: Options<Context>): Parse<C
               const openToken = {
                 start: nextTokenMatch.index,
                 end: tokensIndex,
+                match: nextTokenMatch,
                 token: commentToken,
               };
 
@@ -413,6 +420,7 @@ export const createParseFunction = <Context>(options: Options<Context>): Parse<C
               const closeToken = {
                 start: closeMatch.index,
                 end: tokensIndex,
+                match: closeMatch,
                 token: closeMatch[0],
               };
 
@@ -437,6 +445,22 @@ export const createParseFunction = <Context>(options: Options<Context>): Parse<C
             );
 
             tokensIndex = nextTokenRegexp.lastIndex;
+          }
+
+          if (tokensIndex >= source.length) {
+            if (parsedComments === undefined) {
+              parsedComments = {};
+
+              for (const commentPair of lastParsedToken.comments || emptyComments) {
+                parsedComments[commentPair[0].start] = commentPair;
+              }
+            }
+
+            delete lastParsedToken.comments;
+
+            onError?.(context, source, ...(parsedTokens as ParsedTokens));
+
+            continue findNextStatement;
           }
         }
 
@@ -471,7 +495,12 @@ export const createParseFunction = <Context>(options: Options<Context>): Parse<C
         const {closeRegexp, onError, onParse} = preparedComments[key]!;
 
         index = nextStatementRegexp.lastIndex;
-        const openToken = {start: nextStatementMatch.index, end: index, token};
+        const openToken = {
+          start: nextStatementMatch.index,
+          end: index,
+          match: nextStatementMatch,
+          token,
+        };
 
         closeRegexp.lastIndex = index;
         const closeMatch = closeRegexp.exec(source);
@@ -483,7 +512,12 @@ export const createParseFunction = <Context>(options: Options<Context>): Parse<C
         }
 
         index = closeRegexp.lastIndex;
-        const closeToken = {start: closeMatch.index, end: index, token: closeMatch[0]};
+        const closeToken = {
+          start: closeMatch.index,
+          end: index,
+          match: closeMatch,
+          token: closeMatch[0],
+        };
 
         onParse?.(context, source, openToken, closeToken);
 
