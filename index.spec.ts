@@ -137,7 +137,7 @@ const parseImportsExports = createParseFunction<Context>({
     {
       onError,
       onParse: onImportParse as OnParse,
-      tokens: ['^import ', '("[^"]*";?$\\n?)|(\'[^\']*\';?$\\n?)'],
+      tokens: ['^import ', '("[^"]*";?$\\n?)|(\'[^\']*\';?$)'],
     },
     {
       onError,
@@ -190,11 +190,11 @@ assert(importsExports.multilineComments.length === 3, 'parse multiline comments'
 parseImportsExports(importsExports, '');
 parseImportsExports(importsExports, '                         ');
 
-const errorContext: string[] = [];
+const errorContext: [message: string, index: number][] = [];
 
-const errorParse = createParseFunction<string[]>({
-  onError: (context, _source, message) => {
-    context.push(message);
+const errorParse = createParseFunction<[string, number][]>({
+  onError: (context, _source, message, index) => {
+    context.push([message, index]);
   },
   statements: [{tokens: ['a)|b|(c']}, {tokens: ['d', 'e)|f|(g']}],
 });
@@ -205,13 +205,13 @@ assert(errorContext.length === 0, 'no error for empty source');
 errorParse(errorContext, 'b');
 assert(errorContext.length === 1, 'produce one global error');
 assert(
-  errorContext[0]!.includes('Cannot find statements or comments by regexp'),
+  errorContext[0]![0].includes('Cannot find statements or comments by regexp'),
   'produce expected global error',
 );
 
 errorParse(errorContext, 'ab');
 assert(errorContext.length === 2, 'produce second global error');
-assert(errorContext[1]!.endsWith('at index 1'), 'produce error with correct index');
+assert(errorContext[1]![1] === 1, 'produce error with correct index');
 
 errorParse(errorContext, 'd');
 assert(errorContext.length === 2, 'no global error for statement error');
@@ -219,7 +219,7 @@ assert(errorContext.length === 2, 'no global error for statement error');
 errorParse(errorContext, 'df');
 assert(errorContext.length === 3, 'produce third global error');
 assert(
-  errorContext[2]!.includes('Cannot find next part of statement d or comments by regexp'),
+  errorContext[2]![0].includes('Cannot find next part of statement d or comments by regexp'),
   'produce expected global for part of statement',
 );
 

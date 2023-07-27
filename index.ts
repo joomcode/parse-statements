@@ -41,7 +41,7 @@ type AllLength<P = ParsedTokenWithComments> = {
  */
 type Callback<
   Context,
-  SomeParsedTokens extends readonly ParsedToken[] | [string] = [string],
+  SomeParsedTokens extends readonly ParsedToken[] | ErrorArguments = ErrorArguments,
   Length extends keyof AllLength | 0 = 0,
 > = (
   this: void,
@@ -67,6 +67,11 @@ type Comment<Context> = Readonly<{
  * Pair of the comment open and close tokens (raw or parsed).
  */
 type CommentPair<Token = ParsedToken> = readonly [open: Token, close: Token];
+
+/**
+ * Own arguments of global error callback (after context and source).
+ */
+type ErrorArguments = readonly [message: string, index: number];
 
 /**
  * Key of regexp (name of named capturing groups).
@@ -374,7 +379,8 @@ export const createParseFunction = <Context>(options: Options<Context>): Parse<C
                   onGlobalError?.(
                     context,
                     source,
-                    `Cannot find already parsed comment in statement ${token} with token ${commentToken} at index ${nextTokenMatch.index}`,
+                    `Cannot find already parsed comment in statement ${token} with token ${commentToken}`,
+                    nextTokenMatch.index,
                   );
                 } else {
                   tokensIndex = commentPair[1].end;
@@ -441,7 +447,8 @@ export const createParseFunction = <Context>(options: Options<Context>): Parse<C
             onGlobalError?.(
               context,
               source,
-              `Cannot find next part of statement ${token} or comments by regexp ${nextTokenRegexp} starting at index ${tokensIndex}`,
+              `Cannot find next part of statement ${token} or comments by regexp ${nextTokenRegexp}`,
+              tokensIndex,
             );
 
             tokensIndex = nextTokenRegexp.lastIndex;
@@ -483,7 +490,8 @@ export const createParseFunction = <Context>(options: Options<Context>): Parse<C
             onGlobalError?.(
               context,
               source,
-              `Cannot find already parsed comment with token ${token} at index ${nextStatementMatch.index}`,
+              `Cannot find already parsed comment with token ${token}`,
+              nextStatementMatch.index,
             );
           } else {
             index = commentPair[1].end;
@@ -527,7 +535,8 @@ export const createParseFunction = <Context>(options: Options<Context>): Parse<C
       onGlobalError?.(
         context,
         source,
-        `Cannot find statements or comments by regexp ${nextStatementRegexp} starting at index ${index}`,
+        `Cannot find statements or comments by regexp ${nextStatementRegexp}`,
+        index,
       );
 
       index = nextStatementRegexp.lastIndex;
