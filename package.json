@@ -1,6 +1,6 @@
 {
   "name": "parse-statements",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "description": "Fast and easy parser of statements in source code in any language",
   "author": "uid11",
   "bugs": "https://github.com/uid11/parse-statements/issues",

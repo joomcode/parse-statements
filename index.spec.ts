@@ -10,7 +10,7 @@ export type OnParseThatExceedsMaxLength = OnParse<{}, 33>;
 
 let testsCount = 0;
 
-function assert(value: unknown, message: string): asserts value is true {
+function assert(value: boolean, message: string): asserts value is true {
   if (value !== true) {
     throw new TypeError(`❌ Assert "${message}" fails`);
   }
@@ -40,7 +40,7 @@ try {
   createParseFunction({statements: [{tokens: ['}']}]});
   throwError('Unexpected error');
 } catch (error) {
-  assert(error instanceof SyntaxError, 'createParseFunction throw SyntaxError for invalid regexps');
+  assert(error instanceof SyntaxError, 'throws SyntaxError for invalid regexp');
 }
 
 type Context = Readonly<{
@@ -100,7 +100,7 @@ const onExportParse: OnParse<Context, 2> = ({exports}, source, exportStart, expo
   );
 
   if (exportEnd.match.groups?.['constName']) {
-    assert(exportEnd.match.groups['constName'] === 'qux', 'produce correct groups from match');
+    assert(exportEnd.match.groups['constName'] === 'qux', 'produces correct groups from match');
   }
 
   exports.push([source.slice(exportStart.end, exportEnd.start), ...(exportStartComments || [])]);
@@ -182,10 +182,10 @@ import // comment in import without from;
 );
 
 assert(importsExports.errors.length === 2, 'creates errors');
-assert(importsExports.exports.length === 3, 'parse exports');
-assert(importsExports.imports.length === 4, 'parse imports');
-assert(importsExports.singlelineComments.length === 2, 'parse singleline comments');
-assert(importsExports.multilineComments.length === 3, 'parse multiline comments');
+assert(importsExports.exports.length === 3, 'parses exports');
+assert(importsExports.imports.length === 4, 'parses imports');
+assert(importsExports.singlelineComments.length === 2, 'parses singleline comments');
+assert(importsExports.multilineComments.length === 3, 'parses multiline comments');
 
 parseImportsExports(importsExports, '');
 parseImportsExports(importsExports, '                         ');
@@ -200,34 +200,34 @@ const errorParse = createParseFunction<[string, number][]>({
 });
 
 errorParse(errorContext, '');
-assert(errorContext.length === 0, 'no error for empty source');
+assert(errorContext.length === 0, 'has no error for empty source');
 
 errorParse(errorContext, 'b');
-assert(errorContext.length === 1, 'produce one global error');
+assert(errorContext.length === 1, 'produces one global error');
 assert(
   errorContext[0]![0].includes('Cannot find statements or comments by regexp'),
-  'produce expected global error',
+  'produces expected global error',
 );
 
 errorParse(errorContext, 'ab');
-assert(errorContext.length === 2, 'produce second global error');
-assert(errorContext[1]![1] === 1, 'produce error with correct index');
+assert(errorContext.length === 2, 'produces second global error');
+assert(errorContext[1]![1] === 1, 'produces error with expected index');
 
 errorParse(errorContext, 'd');
-assert(errorContext.length === 2, 'no global error for statement error');
+assert(errorContext.length === 2, 'has no global error for statement error');
 
 errorParse(errorContext, 'df');
-assert(errorContext.length === 3, 'produce third global error');
+assert(errorContext.length === 3, 'produces third global error');
 assert(
   errorContext[2]![0].includes('Cannot find next part of statement d or comments by regexp'),
-  'produce expected global for part of statement',
+  'produces expected global for part of statement',
 );
 
 try {
   parseImportsExports(importsExports, '/* comment with error');
   throwError('Unexpected error');
 } catch (error: unknown) {
-  assert(String(error).includes('comment with error'), 'produce correct comment error');
+  assert(String(error).includes('comment with error'), 'produces expected comment error');
 }
 
 ok(`All ${testsCount} tests passed in ${Date.now() - startTestsTime}ms!`);
