@@ -64,11 +64,6 @@ type Comment<Context> = Readonly<{
 }>;
 
 /**
- * Pair of the comment open and close tokens (raw or parsed).
- */
-type CommentPair<Token = ParsedToken> = readonly [open: Token, close: Token];
-
-/**
  * Own arguments of global error callback (after context and source).
  */
 type ErrorArguments = readonly [message: string, index: number];
@@ -99,11 +94,6 @@ type Options<Context> = Readonly<{
  * Parse function.
  */
 type Parse<Context> = Callback<Context, []>;
-
-/**
- * The result of parsing the token.
- */
-type ParsedToken = Readonly<{start: number; end: number; match: RegExpExecArray; token: string}>;
 
 /**
  * The result of parsing the statement.
@@ -547,6 +537,11 @@ export const createParseFunction = <Context>(options: Options<Context>): Parse<C
 };
 
 /**
+ * Pair of the comment open and close tokens (raw or parsed).
+ */
+export type CommentPair<Token = ParsedToken> = readonly [open: Token, close: Token];
+
+/**
  * onError callback handler for error on comment parsing.
  */
 export type OnCommentError<Context> = Callback<Context, [open: ParsedToken]>;
@@ -564,3 +559,13 @@ export type OnParse<Context = any, Length extends keyof AllLength | 0 = 0> = Cal
   ParsedTokens,
   Length
 >;
+
+/**
+ * The result of parsing the token.
+ */
+export type ParsedToken = Readonly<{
+  start: number;
+  end: number;
+  match: RegExpExecArray;
+  token: string;
+}>;

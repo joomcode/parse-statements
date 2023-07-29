@@ -122,7 +122,7 @@ const parseImportsExports = createParseFunction<Context>({
     {
       onError: onCommentError,
       onParse: onCommentParse,
-      tokens: ['\\/\\/', '$\\n?'],
+      tokens: ['\\/\\/', '$'],
     },
     {
       onError: onCommentError,
@@ -137,7 +137,7 @@ const parseImportsExports = createParseFunction<Context>({
     {
       onError,
       onParse: onImportParse as OnParse,
-      tokens: ['^import ', '("[^"]*";?$\\n?)|(\'[^\']*\';?$)'],
+      tokens: ['^import ', '[\'"];?$'],
     },
     {
       onError,
