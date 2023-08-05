@@ -86,7 +86,7 @@ type Mutable<T> = {
  */
 type Options<Context> = Readonly<{
   comments?: readonly Comment<Context>[];
-  onError?: Callback<Context>;
+  onError?: OnGlobalError<Context>;
   statements?: readonly Statement<Context>[];
 }>;
 
@@ -550,6 +550,11 @@ export type OnCommentError<Context> = Callback<Context, [open: ParsedToken]>;
  * onParse callback handler of comment.
  */
 export type OnCommentParse<Context> = Callback<Context, CommentPair>;
+
+/**
+ * Global onError callback handler for error on parsing.
+ */
+export type OnGlobalError<Context> = Callback<Context>;
 
 /**
  * onParse callback handler of statement with concrete length (number of tokens).
