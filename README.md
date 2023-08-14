@@ -30,6 +30,9 @@ Similar optional callbacks can be set for comments.
 
 ## Basic example
 
+Below is a simplified example of parsing `import` and `export` statements in ECMAScript
+(a complete example can be found [here](https://github.com/uid11/parse-imports-exports/blob/main/index.ts)):
+
 ```ts
 import {createParseFunction} from 'parse-statements';
 

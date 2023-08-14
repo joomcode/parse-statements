@@ -166,7 +166,7 @@ type Statement<Context> = Readonly<{
 type TokenWithKey = readonly [key: Key, token: string];
 
 /**
- * Create regexp by tokens.
+ * Creates regexp by tokens.
  */
 const createRegexp = (...tokens: readonly TokenWithKey[]): RegExp => {
   if (!tokens[0]) {

@@ -1,7 +1,7 @@
 {
   "name": "parse-statements",
-  "version": "0.0.7",
-  "description": "Fast and easy parser of statements in source code in any language",
+  "version": "0.0.8",
+  "description": "Fast and easy parser of statements in source code in any language ✂️",
   "author": "uid11",
   "bugs": "https://github.com/uid11/parse-statements/issues",
   "devDependencies": {
@@ -29,7 +29,7 @@
     "url": "https://github.com/uid11/parse-statements"
   },
   "scripts": {
-    "prebuild": "rm --force *.js *.d.ts",
+    "prebuild": "rm -f *.js *.d.ts",
     "build": "tsc",
     "prettier": "prettier --cache --cache-strategy=content --write . !package-lock.json",
     "test": "export _START=$(date +%s%3N) && npm run prettier && npm run build && node ./index.spec.js",
