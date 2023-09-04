@@ -1,19 +1,20 @@
 {
   "name": "parse-statements",
-  "version": "0.0.9",
+  "version": "0.0.10",
   "description": "Fast and easy parser of statements in source code in any language ✂️",
   "author": "uid11",
   "bugs": "https://github.com/uid11/parse-statements/issues",
   "devDependencies": {
     "prettier": ">=3",
-    "typescript": ">=5.1"
+    "typescript": ">=5.2"
   },
   "exports": {
     ".": "./index.js"
   },
   "files": [
     "index.js",
-    "index.d.ts"
+    "index.d.ts",
+    "types.d.ts"
   ],
   "homepage": "https://github.com/uid11/parse-statements#readme",
   "keywords": [
