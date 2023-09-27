@@ -31,7 +31,7 @@ Similar optional callbacks can be set for comments.
 ## Basic example
 
 Below is a simplified example of parsing `import` and `export` statements in ECMAScript
-(a complete example can be found [here](https://github.com/uid11/parse-imports-exports/blob/main/index.ts)):
+(a complete example can be found [here](https://github.com/joomcode/parse-imports-exports/blob/main/index.ts)):
 
 ```ts
 import {createParseFunction} from 'parse-statements';
@@ -182,7 +182,7 @@ npm install parse-statements
 [conventional-commits-image]: https://img.shields.io/badge/Conventional_Commits-1.0.0-yellow.svg 'The Conventional Commits specification'
 [conventional-commits-url]: https://www.conventionalcommits.org/en/v1.0.0/
 [dependencies-none-image]: https://img.shields.io/badge/dependencies-none-success.svg 'No dependencies'
-[dependencies-none-url]: https://github.com/uid11/parse-statements/blob/main/package.json
+[dependencies-none-url]: https://github.com/joomcode/parse-statements/blob/main/package.json
 [license-image]: https://img.shields.io/badge/license-MIT-blue.svg 'The MIT License'
 [license-url]: LICENSE
 [npm-image]: https://img.shields.io/npm/v/parse-statements.svg 'parse-statements'

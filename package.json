@@ -1,9 +1,9 @@
 {
   "name": "parse-statements",
-  "version": "0.0.10",
+  "version": "1.0.0",
   "description": "Fast and easy parser of statements in source code in any language ✂️",
   "author": "uid11",
-  "bugs": "https://github.com/uid11/parse-statements/issues",
+  "bugs": "https://github.com/joomcode/parse-statements/issues",
   "devDependencies": {
     "prettier": ">=3",
     "typescript": ">=5.2"
@@ -16,7 +16,7 @@
     "index.d.ts",
     "types.d.ts"
   ],
-  "homepage": "https://github.com/uid11/parse-statements#readme",
+  "homepage": "https://github.com/joomcode/parse-statements#readme",
   "keywords": [
     "parse",
     "parser",
@@ -27,7 +27,7 @@
   "packageManager": "npm@9",
   "repository": {
     "type": "git",
-    "url": "https://github.com/uid11/parse-statements"
+    "url": "https://github.com/joomcode/parse-statements"
   },
   "scripts": {
     "prebuild": "rm -f *.js *.d.ts",
