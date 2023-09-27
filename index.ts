@@ -390,6 +390,7 @@ export type {
   OnCommentParse,
   OnGlobalError,
   OnParse,
+  Options,
   Parse,
   ParsedToken,
 } from './types';
