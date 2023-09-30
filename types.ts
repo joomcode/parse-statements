@@ -77,6 +77,7 @@ type ParsedTokensByLength<Length extends keyof AllLength> = [...AllLength[Length
  * Description of statement as the callback handlers and a sequence of tokens.
  */
 type Statement<Context> = Readonly<{
+  canIncludeComments: boolean;
   onError?: OnParse<Context>;
   onParse?: OnParse<Context>;
   tokens: readonly [string, ...string[]];

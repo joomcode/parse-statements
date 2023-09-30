@@ -52,8 +52,11 @@ const getPreparedOptions = <Context>({
   const firstTokens: TokenWithKey[] = [];
   let keyIndex = 1;
   const openTokens: TokenWithKey[] = [];
-  const preparedComments: Record<Key, PreparedComment<Context>> = {};
-  const preparedStatements: Record<Key, PreparedStatement<Context>> = {};
+  const preparedComments = {__proto__: null} as unknown as Record<Key, PreparedComment<Context>>;
+  const preparedStatements = {__proto__: null} as unknown as Record<
+    Key,
+    PreparedStatement<Context>
+  >;
   const statementsKeys: Key[] = [];
 
   for (const {
@@ -71,6 +74,7 @@ const getPreparedOptions = <Context>({
   }
 
   for (const {
+    canIncludeComments,
     onError,
     onParse,
     tokens: [firstToken, ...restTokens],
@@ -83,7 +87,10 @@ const getPreparedOptions = <Context>({
 
     for (const nextToken of restTokens) {
       const nextTokenKey: Key = `parseStatementsPackageStatementPart${keyIndex++}`;
-      const nextTokenRegExp = createRegExp([nextTokenKey, nextToken], ...openTokens);
+      const nextTokenRegExp = createRegExp(
+        [nextTokenKey, nextToken],
+        ...(canIncludeComments ? openTokens : (emptyComments as unknown as TokenWithKey[])),
+      );
 
       tokens.push({nextTokenKey, nextTokenRegExp});
     }

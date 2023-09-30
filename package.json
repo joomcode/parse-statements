@@ -1,6 +1,6 @@
 {
   "name": "parse-statements",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Fast and easy parser of statements in source code in any language ✂️",
   "author": "uid11",
   "bugs": "https://github.com/joomcode/parse-statements/issues",
