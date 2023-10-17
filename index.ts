@@ -1,34 +1,13 @@
+import {getPreparedOptions} from './getPreparedOptions';
+
 import type {
   CommentPair,
-  Key,
   Mutable,
   Options,
   Parse,
   ParsedTokens,
   ParsedTokenWithComments,
-  PreparedComment,
-  PreparedOptions,
-  PreparedStatement,
-  PreparedToken,
-  TokenWithKey,
 } from './types';
-
-/**
- * Creates regexp by tokens.
- */
-const createRegExp = (...tokens: readonly TokenWithKey[]): RegExp => {
-  if (!tokens[0]) {
-    return emptyRegExp;
-  }
-
-  let source = tokens[0][1];
-
-  if (tokens[0][0] !== '') {
-    source = tokens.map(([key, token]) => `(?<${key}>${token})`).join('|');
-  }
-
-  return new RegExp(source, 'gmu');
-};
 
 /**
  * Empty comments array to skip `for-or` cycle.
@@ -36,85 +15,10 @@ const createRegExp = (...tokens: readonly TokenWithKey[]): RegExp => {
 const emptyComments: readonly CommentPair[] = [];
 
 /**
- * Empty regexp that match only the empty string.
- */
-const emptyRegExp = /^$/g;
-
-/**
- * Get internal prepared options from public options.
- */
-const getPreparedOptions = <Context>({
-  comments = [],
-  onError,
-  statements = [],
-}: Options<Context>): PreparedOptions<Context> => {
-  const commentsKeys: Key[] = [];
-  const firstTokens: TokenWithKey[] = [];
-  let keyIndex = 1;
-  const openTokens: TokenWithKey[] = [];
-  const preparedComments = {__proto__: null} as unknown as Record<Key, PreparedComment<Context>>;
-  const preparedStatements = {__proto__: null} as unknown as Record<
-    Key,
-    PreparedStatement<Context>
-  >;
-  const statementsKeys: Key[] = [];
-
-  for (const {
-    onError,
-    onParse,
-    tokens: [open, close],
-  } of comments) {
-    const closeRegExp = createRegExp(['', close]);
-    const key: Key = `parseStatementsPackageComment${keyIndex++}`;
-
-    commentsKeys.push(key);
-    openTokens.push([key, open]);
-
-    preparedComments[key] = {closeRegExp, onError, onParse};
-  }
-
-  for (const {
-    canIncludeComments,
-    onError,
-    onParse,
-    tokens: [firstToken, ...restTokens],
-  } of statements) {
-    const statementKey: Key = `parseStatementsPackageStatement${keyIndex++}`;
-    const tokens: PreparedToken[] = [];
-
-    firstTokens.push([statementKey, firstToken]);
-    statementsKeys.push(statementKey);
-
-    for (const nextToken of restTokens) {
-      const nextTokenKey: Key = `parseStatementsPackageStatementPart${keyIndex++}`;
-      const nextTokenRegExp = createRegExp(
-        [nextTokenKey, nextToken],
-        ...(canIncludeComments ? openTokens : (emptyComments as unknown as TokenWithKey[])),
-      );
-
-      tokens.push({nextTokenKey, nextTokenRegExp});
-    }
-
-    preparedStatements[statementKey] = {onError, onParse, tokens};
-  }
-
-  const nextStatementRegExp = createRegExp(...firstTokens, ...openTokens);
-
-  return {
-    commentsKeys,
-    nextStatementRegExp,
-    onError,
-    preparedComments,
-    preparedStatements,
-    statementsKeys,
-  };
-};
-
-/**
  * Creates parse function by comments and statements.
  */
 export const createParseFunction = <Context>(options: Options<Context>): Parse<Context> => {
-  const {
+  var {
     commentsKeys,
     nextStatementRegExp,
     onError: onGlobalError,
@@ -123,9 +27,9 @@ export const createParseFunction = <Context>(options: Options<Context>): Parse<C
     statementsKeys,
   } = getPreparedOptions(options);
   const parse: Parse<Context> = (context, source) => {
-    let index = 0;
-    let parsedComments: Record<number, CommentPair> | undefined;
-    let previousIndex: number | undefined;
+    var index = 0;
+    var parsedComments: Record<number, CommentPair> | undefined;
+    var previousIndex: number | undefined;
 
     findNextStatement: while (index < source.length) {
       if (index === previousIndex) {
@@ -190,7 +94,11 @@ export const createParseFunction = <Context>(options: Options<Context>): Parse<C
 
               delete lastParsedToken.comments;
 
-              onError?.(context, source, ...(parsedTokens as ParsedTokens));
+              const maybeIndex = onError?.(context, source, ...(parsedTokens as ParsedTokens));
+
+              if (maybeIndex !== undefined) {
+                index = maybeIndex;
+              }
 
               continue findNextStatement;
             }
@@ -230,14 +138,11 @@ export const createParseFunction = <Context>(options: Options<Context>): Parse<C
                 } else {
                   tokensIndex = commentPair[1].end;
 
-                  let {comments} = lastParsedToken;
-
-                  if (comments === undefined) {
-                    comments = [];
-                    lastParsedToken.comments = comments;
+                  if (lastParsedToken.comments === undefined) {
+                    lastParsedToken.comments = [];
                   }
 
-                  (comments as CommentPair[]).push(commentPair);
+                  (lastParsedToken.comments as CommentPair[]).push(commentPair);
 
                   continue findNextToken;
                 }
@@ -275,14 +180,11 @@ export const createParseFunction = <Context>(options: Options<Context>): Parse<C
                 token: closeMatch[0],
               };
 
-              let {comments} = lastParsedToken;
-
-              if (comments === undefined) {
-                comments = [];
-                lastParsedToken.comments = comments;
+              if (lastParsedToken.comments === undefined) {
+                lastParsedToken.comments = [];
               }
 
-              (comments as CommentPair[]).push([openToken, closeToken]);
+              (lastParsedToken.comments as CommentPair[]).push([openToken, closeToken]);
 
               onCommentParse?.(context, source, openToken, closeToken);
 
@@ -310,13 +212,21 @@ export const createParseFunction = <Context>(options: Options<Context>): Parse<C
 
             delete lastParsedToken.comments;
 
-            onError?.(context, source, ...(parsedTokens as ParsedTokens));
+            const maybeIndex = onError?.(context, source, ...(parsedTokens as ParsedTokens));
+
+            if (maybeIndex !== undefined) {
+              index = maybeIndex;
+            }
 
             continue findNextStatement;
           }
         }
 
-        onParse?.(context, source, ...(parsedTokens as ParsedTokens));
+        const maybeIndex = onParse?.(context, source, ...(parsedTokens as ParsedTokens));
+
+        if (maybeIndex !== undefined) {
+          index = maybeIndex;
+        }
 
         continue findNextStatement;
       }

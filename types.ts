@@ -39,44 +39,29 @@ type AllLength<P = ParsedTokenWithComments> = {
 /**
  * A callback handler called on successful parsing of a statement or on an error during parsing.
  */
-type Callback<
-  Context,
-  SomeParsedTokens extends readonly ParsedToken[] | ErrorArguments = ErrorArguments,
-  Length extends keyof AllLength | 0 = 0,
-> = (
+type Callback<Context, Arguments extends readonly unknown[], Return = void> = (
   this: void,
   context: Context,
   source: string,
-  ...parsedTokens: SomeParsedTokens extends ParsedTokens
-    ? Length extends 0
-      ? SomeParsedTokens
-      : ParsedTokensByLength<Length extends keyof AllLength ? Length : never>
-    : SomeParsedTokens
-) => void;
+  ...args: Arguments
+) => Return;
 
 /**
  * Description of comment as the callback handlers and open and close tokens.
  */
 type Comment<Context> = Readonly<{
   onError?: OnCommentError<Context>;
-  onParse?: Callback<Context, CommentPair>;
+  onParse?: OnCommentParse<Context>;
   tokens: CommentPair<string>;
 }>;
-
-/**
- * Own arguments of global error callback (after context and source).
- */
-type ErrorArguments = readonly [message: string, index: number];
-
-/**
- * The result of parsing the statement with concrete length (number of tokens).
- */
-type ParsedTokensByLength<Length extends keyof AllLength> = [...AllLength[Length], ParsedToken];
 
 /**
  * Description of statement as the callback handlers and a sequence of tokens.
  */
 type Statement<Context> = Readonly<{
+  /**
+   * If `true`, then we parse comments inside the statement (between its parts).
+   */
   canIncludeComments: boolean;
   onError?: OnParse<Context>;
   onParse?: OnParse<Context>;
@@ -94,35 +79,44 @@ export type CommentPair<Token = ParsedToken> = readonly [open: Token, close: Tok
 export type Key = string;
 
 /**
- * onError callback handler for error on comment parsing.
+ * `onError` callback handler for error on comment parsing.
  */
 export type OnCommentError<Context> = Callback<Context, [open: ParsedToken]>;
 
 /**
- * onParse callback handler of comment.
+ * `onParse` callback handler of comment.
  */
 export type OnCommentParse<Context> = Callback<Context, CommentPair>;
 
 /**
- * Global onError callback handler for error on parsing.
+ * Global `onError` callback handler for error on parsing.
  */
-export type OnGlobalError<Context> = Callback<Context>;
+export type OnGlobalError<Context> = Callback<Context, [message: string, index: number]>;
 
 /**
- * onParse callback handler of statement with concrete length (number of tokens).
+ * `onParse` callback handler of statement with concrete length (number of tokens).
  */
 export type OnParse<Context = any, Length extends keyof AllLength | 0 = 0> = Callback<
   Context,
-  ParsedTokens,
-  Length
+  Length extends keyof AllLength ? [...AllLength[Length], ParsedToken] : ParsedTokens,
+  void | number
 >;
 
 /**
- * Options of createParseFunction function.
+ * Options of `createParseFunction` function.
  */
 export type Options<Context> = Readonly<{
+  /**
+   * An optional array of comments as token pairs with optional callbacks.
+   */
   comments?: readonly Comment<Context>[];
+  /**
+   * An optional callback for global parsing errors.
+   */
   onError?: OnGlobalError<Context>;
+  /**
+   * An optional array of statements as a non-empty array of tokens with optional callbacks.
+   */
   statements?: readonly Statement<Context>[];
 }>;
 
@@ -130,8 +124,8 @@ export type Options<Context> = Readonly<{
  * Returns a copy of the object type with mutable properties.
  * `Mutable<{readonly foo: string}>` = `{foo: string}`.
  */
-export type Mutable<T> = {
-  -readonly [K in keyof T]: T[K];
+export type Mutable<Type> = {
+  -readonly [Key in keyof Type]: Type[Key];
 };
 
 /**
@@ -143,9 +137,21 @@ export type Parse<Context> = Callback<Context, []>;
  * The result of parsing the token.
  */
 export type ParsedToken = Readonly<{
+  /**
+   * Index of token start (in source code).
+   */
   start: number;
+  /**
+   * Index of token end (in source code).
+   */
   end: number;
+  /**
+   * The result of calling the `exec` method in which this token was found.
+   */
   match: RegExpExecArray;
+  /**
+   * The found token as a substring of the source code.
+   */
   token: string;
 }>;
 

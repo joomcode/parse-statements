@@ -19,7 +19,7 @@ Strings are used to describe (find) tokens, from which regexps with `gmu` flags 
 (therefore, the backslash in these lines must be escaped, that is, it must be doubled).
 
 For each parsed statement, the optional `onParse` callback is called with the context,
-source text, and an array of tokens of statement
+source code (string), and an array of tokens of statement
 (and an array of comments between this token and the next one, if any).
 
 If the sequence of tokens of statement has not completed, instead of the `onParse` callback,
@@ -27,6 +27,20 @@ an `onError` callback with the same signature is called, receiving an incomplete
 of parsed tokens of statement.
 
 Similar optional callbacks can be set for comments.
+
+Callbacks for statements (only for statements, not for comments) can return a number
+instead of an `undefined` — then this number will be used as an index at the source code,
+starting from which the parser will find the next statement.
+
+In fact, this index will be interpreted as the end of the statement. By default,
+the end of the statement coincides with the end of its last token,
+but sometimes we may need to go beyond the boundaries of the found tokens
+(or, conversely, reduce the length of the statement, that is, reduce its end index).
+
+With such manual parsing, if we increase the index of the end of the statement,
+we must remember to manually parse the comments that may appear
+in this part of the statement — because the parser itself will not do this.
+It will continue to work from the new end of the statement as usual.
 
 ## Basic example
 

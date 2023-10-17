@@ -280,6 +280,7 @@ const parseWithoutComments = createParseFunction<string[]>({
       tokens: ['<', '>'],
     },
   ],
+  onError: (_context, _source, message) => throwError(message),
   statements: [
     {
       canIncludeComments: false,
@@ -296,6 +297,71 @@ parseWithoutComments(withoutCommentsContext, ' <comment> a <foo> b<bar>c <baz>')
 assert(
   withoutCommentsContext.join('|') === 'comment|baz',
   'does not parse comments inside statement with `canIncludeComments = false`',
+);
+
+const onMultilineExportParse: OnParse<Context, 2> = ({exports}, source, exportStart, exportEnd) => {
+  let index = exportStart.end + 1;
+
+  for (; index < source.length; index += 1) {
+    if (source[index] === '}') {
+      break;
+    }
+  }
+
+  if (index === source.length) {
+    throwError(
+      `Cannot find end of export statement (${source.slice(exportStart.start, exportEnd.end)})`,
+    );
+  }
+
+  let unparsed = source.slice(exportStart.end + 1, index);
+
+  unparsed = unparsed.trim().replace(/\s+/g, '');
+
+  const newExports = unparsed.split(',').filter(Boolean);
+
+  for (const newExport of newExports) {
+    exports.push([newExport]);
+  }
+
+  return index;
+};
+
+const parseExports = createParseFunction<Context>({
+  onError: (_context, _source, message) => throwError(message),
+  statements: [
+    {
+      canIncludeComments: false,
+      onError,
+      onParse: onMultilineExportParse as OnParse,
+      tokens: ['^export \\{', '$'],
+    },
+  ],
+});
+
+const parsedExports: Context = {
+  errors: [],
+  exports: [],
+  imports: [],
+  multilineComments: [],
+  singlelineComments: [],
+};
+
+parseExports(
+  parsedExports,
+  `
+export {
+  foo,
+  bar, baz,
+export {,qux
+} from 'typescript';
+`,
+);
+
+assert(
+  parsedExports.errors.length === 0 &&
+    parsedExports.exports.join(',') === 'foo,bar,baz,export{,qux',
+  'correctly parses statements with index that moved by onParse function',
 );
 
 ok(`All ${testsCount} tests passed in ${Date.now() - startTestsTime}ms!`);

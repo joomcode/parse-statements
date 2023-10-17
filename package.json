@@ -1,6 +1,6 @@
 {
   "name": "parse-statements",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "Fast and easy parser of statements in source code in any language ✂️",
   "author": "uid11",
   "bugs": "https://github.com/joomcode/parse-statements/issues",
@@ -12,6 +12,7 @@
     ".": "./index.js"
   },
   "files": [
+    "getPreparedOptions.js",
     "index.js",
     "index.d.ts",
     "types.d.ts"
