@@ -138,9 +138,7 @@ export const createParseFunction = <Context>(options: Options<Context>): Parse<C
                 } else {
                   tokensIndex = commentPair[1].end;
 
-                  if (lastParsedToken.comments === undefined) {
-                    lastParsedToken.comments = [];
-                  }
+                  lastParsedToken.comments ??= [];
 
                   (lastParsedToken.comments as CommentPair[]).push(commentPair);
 
@@ -180,9 +178,7 @@ export const createParseFunction = <Context>(options: Options<Context>): Parse<C
                 token: closeMatch[0],
               };
 
-              if (lastParsedToken.comments === undefined) {
-                lastParsedToken.comments = [];
-              }
+              lastParsedToken.comments ??= [];
 
               (lastParsedToken.comments as CommentPair[]).push([openToken, closeToken]);
 

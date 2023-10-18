@@ -118,11 +118,13 @@ const onImportParse: OnParse<Context, 3> = (
 const parseImportsExports = createParseFunction<Context>({
   comments: [
     {
+      canIncludeComments: true,
       onError: onCommentError,
       onParse: onCommentParse,
       tokens: ['\\/\\/', '$\\n?'],
     },
     {
+      canIncludeComments: true,
       onError: onCommentError,
       onParse: ({multilineComments}, source, {end}, {start}) => {
         multilineComments.push(source.slice(end, start));
