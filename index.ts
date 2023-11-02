@@ -10,11 +10,6 @@ import type {
 } from './types';
 
 /**
- * Empty comments array to skip `for-or` cycle.
- */
-const emptyComments: readonly CommentPair[] = [];
-
-/**
  * Creates parse function by comments and statements.
  */
 export const createParseFunction = <Context>(options: Options<Context>): Parse<Context> => {
@@ -307,3 +302,8 @@ export type {
   Parse,
   ParsedToken,
 } from './types';
+
+/**
+ * Empty comments array to skip `for-or` cycle.
+ */
+const emptyComments: readonly CommentPair[] = [];

@@ -1,74 +1,4 @@
 /**
- * Supported number of tokens in statements.
- */
-type AllLength<P = ParsedTokenWithComments> = {
-  1: [];
-  2: [P];
-  3: [P, P];
-  4: [P, P, P];
-  5: [P, P, P, P];
-  6: [P, P, P, P, P];
-  7: [P, P, P, P, P, P];
-  8: [P, P, P, P, P, P, P];
-  9: [P, P, P, P, P, P, P, P];
-  10: [P, P, P, P, P, P, P, P, P];
-  11: [P, P, P, P, P, P, P, P, P, P];
-  12: [P, P, P, P, P, P, P, P, P, P, P];
-  13: [P, P, P, P, P, P, P, P, P, P, P, P];
-  14: [P, P, P, P, P, P, P, P, P, P, P, P, P];
-  15: [P, P, P, P, P, P, P, P, P, P, P, P, P, P];
-  16: [P, P, P, P, P, P, P, P, P, P, P, P, P, P, P];
-  17: [P, P, P, P, P, P, P, P, P, P, P, P, P, P, P, P];
-  18: [P, P, P, P, P, P, P, P, P, P, P, P, P, P, P, P, P];
-  19: [P, P, P, P, P, P, P, P, P, P, P, P, P, P, P, P, P, P];
-  20: [P, P, P, P, P, P, P, P, P, P, P, P, P, P, P, P, P, P, P];
-  21: [P, P, P, P, P, P, P, P, P, P, P, P, P, P, P, P, P, P, P, P];
-  22: [P, P, P, P, P, P, P, P, P, P, P, P, P, P, P, P, P, P, P, P, P];
-  23: [P, P, P, P, P, P, P, P, P, P, P, P, P, P, P, P, P, P, P, P, P, P];
-  24: [P, P, P, P, P, P, P, P, P, P, P, P, P, P, P, P, P, P, P, P, P, P, P];
-  25: [P, P, P, P, P, P, P, P, P, P, P, P, P, P, P, P, P, P, P, P, P, P, P, P];
-  26: [P, P, P, P, P, P, P, P, P, P, P, P, P, P, P, P, P, P, P, P, P, P, P, P, P];
-  27: [P, P, P, P, P, P, P, P, P, P, P, P, P, P, P, P, P, P, P, P, P, P, P, P, P, P];
-  28: [P, P, P, P, P, P, P, P, P, P, P, P, P, P, P, P, P, P, P, P, P, P, P, P, P, P, P];
-  29: [P, P, P, P, P, P, P, P, P, P, P, P, P, P, P, P, P, P, P, P, P, P, P, P, P, P, P, P];
-  30: [P, P, P, P, P, P, P, P, P, P, P, P, P, P, P, P, P, P, P, P, P, P, P, P, P, P, P, P, P];
-  31: [P, P, P, P, P, P, P, P, P, P, P, P, P, P, P, P, P, P, P, P, P, P, P, P, P, P, P, P, P, P];
-  32: [P, P, P, P, P, P, P, P, P, P, P, P, P, P, P, P, P, P, P, P, P, P, P, P, P, P, P, P, P, P, P];
-};
-
-/**
- * A callback handler called on successful parsing of a statement or on an error during parsing.
- */
-type Callback<Context, Arguments extends readonly unknown[], Return = void> = (
-  this: void,
-  context: Context,
-  source: string,
-  ...args: Arguments
-) => Return;
-
-/**
- * Description of comment as the callback handlers and open and close tokens.
- */
-type Comment<Context> = Readonly<{
-  onError?: OnCommentError<Context>;
-  onParse?: OnCommentParse<Context>;
-  tokens: CommentPair<string>;
-}>;
-
-/**
- * Description of statement as the callback handlers and a sequence of tokens.
- */
-type Statement<Context> = Readonly<{
-  /**
-   * If `true`, then we parse comments inside the statement (between its parts).
-   */
-  canIncludeComments: boolean;
-  onError?: OnParse<Context>;
-  onParse?: OnParse<Context>;
-  tokens: readonly [string, ...string[]];
-}>;
-
-/**
  * Pair of the comment open and close tokens (raw or parsed).
  */
 export type CommentPair<Token = ParsedToken> = readonly [open: Token, close: Token];
@@ -210,3 +140,73 @@ export type PreparedToken = Readonly<{
  * Pair of the token and his regexp key.
  */
 export type TokenWithKey = readonly [key: Key, token: string];
+
+/**
+ * Supported number of tokens in statements.
+ */
+type AllLength<P = ParsedTokenWithComments> = {
+  1: [];
+  2: [P];
+  3: [P, P];
+  4: [P, P, P];
+  5: [P, P, P, P];
+  6: [P, P, P, P, P];
+  7: [P, P, P, P, P, P];
+  8: [P, P, P, P, P, P, P];
+  9: [P, P, P, P, P, P, P, P];
+  10: [P, P, P, P, P, P, P, P, P];
+  11: [P, P, P, P, P, P, P, P, P, P];
+  12: [P, P, P, P, P, P, P, P, P, P, P];
+  13: [P, P, P, P, P, P, P, P, P, P, P, P];
+  14: [P, P, P, P, P, P, P, P, P, P, P, P, P];
+  15: [P, P, P, P, P, P, P, P, P, P, P, P, P, P];
+  16: [P, P, P, P, P, P, P, P, P, P, P, P, P, P, P];
+  17: [P, P, P, P, P, P, P, P, P, P, P, P, P, P, P, P];
+  18: [P, P, P, P, P, P, P, P, P, P, P, P, P, P, P, P, P];
+  19: [P, P, P, P, P, P, P, P, P, P, P, P, P, P, P, P, P, P];
+  20: [P, P, P, P, P, P, P, P, P, P, P, P, P, P, P, P, P, P, P];
+  21: [P, P, P, P, P, P, P, P, P, P, P, P, P, P, P, P, P, P, P, P];
+  22: [P, P, P, P, P, P, P, P, P, P, P, P, P, P, P, P, P, P, P, P, P];
+  23: [P, P, P, P, P, P, P, P, P, P, P, P, P, P, P, P, P, P, P, P, P, P];
+  24: [P, P, P, P, P, P, P, P, P, P, P, P, P, P, P, P, P, P, P, P, P, P, P];
+  25: [P, P, P, P, P, P, P, P, P, P, P, P, P, P, P, P, P, P, P, P, P, P, P, P];
+  26: [P, P, P, P, P, P, P, P, P, P, P, P, P, P, P, P, P, P, P, P, P, P, P, P, P];
+  27: [P, P, P, P, P, P, P, P, P, P, P, P, P, P, P, P, P, P, P, P, P, P, P, P, P, P];
+  28: [P, P, P, P, P, P, P, P, P, P, P, P, P, P, P, P, P, P, P, P, P, P, P, P, P, P, P];
+  29: [P, P, P, P, P, P, P, P, P, P, P, P, P, P, P, P, P, P, P, P, P, P, P, P, P, P, P, P];
+  30: [P, P, P, P, P, P, P, P, P, P, P, P, P, P, P, P, P, P, P, P, P, P, P, P, P, P, P, P, P];
+  31: [P, P, P, P, P, P, P, P, P, P, P, P, P, P, P, P, P, P, P, P, P, P, P, P, P, P, P, P, P, P];
+  32: [P, P, P, P, P, P, P, P, P, P, P, P, P, P, P, P, P, P, P, P, P, P, P, P, P, P, P, P, P, P, P];
+};
+
+/**
+ * A callback handler called on successful parsing of a statement or on an error during parsing.
+ */
+type Callback<Context, Arguments extends readonly unknown[], Return = void> = (
+  this: void,
+  context: Context,
+  source: string,
+  ...args: Arguments
+) => Return;
+
+/**
+ * Description of comment as the callback handlers and open and close tokens.
+ */
+type Comment<Context> = Readonly<{
+  onError?: OnCommentError<Context>;
+  onParse?: OnCommentParse<Context>;
+  tokens: CommentPair<string>;
+}>;
+
+/**
+ * Description of statement as the callback handlers and a sequence of tokens.
+ */
+type Statement<Context> = Readonly<{
+  /**
+   * If `true`, then we parse comments inside the statement (between its parts).
+   */
+  canIncludeComments: boolean;
+  onError?: OnParse<Context>;
+  onParse?: OnParse<Context>;
+  tokens: readonly [string, ...string[]];
+}>;

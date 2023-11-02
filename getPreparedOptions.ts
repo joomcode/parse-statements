@@ -9,33 +9,6 @@ import type {
 } from './types';
 
 /**
- * Creates regexp by tokens.
- */
-const createRegExp = (...tokens: readonly TokenWithKey[]): RegExp => {
-  if (!tokens[0]) {
-    return emptyRegExp;
-  }
-
-  let source = tokens[0][1];
-
-  if (tokens[0][0] !== '') {
-    source = tokens.map(([key, token]) => `(?<${key}>${token})`).join('|');
-  }
-
-  return new RegExp(source, 'gmu');
-};
-
-/**
- * Empty regexp that match only the empty string.
- */
-const emptyRegExp = /^$/g;
-
-/**
- * Empty tokens array to skip comments into statements with `canIncludeComments` option.
- */
-const emptyTokens: readonly TokenWithKey[] = [];
-
-/**
  * Get internal prepared options from public options.
  */
 export const getPreparedOptions = <Context>({
@@ -104,3 +77,30 @@ export const getPreparedOptions = <Context>({
     statementsKeys,
   };
 };
+
+/**
+ * Creates regexp by tokens.
+ */
+const createRegExp = (...tokens: readonly TokenWithKey[]): RegExp => {
+  if (!tokens[0]) {
+    return emptyRegExp;
+  }
+
+  let source = tokens[0][1];
+
+  if (tokens[0][0] !== '') {
+    source = tokens.map(([key, token]) => `(?<${key}>${token})`).join('|');
+  }
+
+  return new RegExp(source, 'gmu');
+};
+
+/**
+ * Empty regexp that match only the empty string.
+ */
+const emptyRegExp = /^$/g;
+
+/**
+ * Empty tokens array to skip comments into statements with `canIncludeComments` option.
+ */
+const emptyTokens: readonly TokenWithKey[] = [];
