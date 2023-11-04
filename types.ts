@@ -1,4 +1,13 @@
 /**
+ * Description of comment as the callback handlers and open and close tokens.
+ */
+export type Comment<Context> = Readonly<{
+  onError?: OnCommentError<Context>;
+  onParse?: OnCommentParse<Context>;
+  tokens: CommentPair<string>;
+}>;
+
+/**
  * Pair of the comment open and close tokens (raw or parsed).
  */
 export type CommentPair<Token = ParsedToken> = readonly [open: Token, close: Token];
@@ -137,6 +146,19 @@ export type PreparedToken = Readonly<{
 }>;
 
 /**
+ * Description of statement as the callback handlers and a sequence of tokens.
+ */
+export type Statement<Context> = Readonly<{
+  /**
+   * If `true`, then we parse comments inside the statement (between its parts).
+   */
+  canIncludeComments: boolean;
+  onError?: OnParse<Context>;
+  onParse?: OnParse<Context>;
+  tokens: readonly [string, ...string[]];
+}>;
+
+/**
  * Pair of the token and his regexp key.
  */
 export type TokenWithKey = readonly [key: Key, token: string];
@@ -188,25 +210,3 @@ type Callback<Context, Arguments extends readonly unknown[], Return = void> = (
   source: string,
   ...args: Arguments
 ) => Return;
-
-/**
- * Description of comment as the callback handlers and open and close tokens.
- */
-type Comment<Context> = Readonly<{
-  onError?: OnCommentError<Context>;
-  onParse?: OnCommentParse<Context>;
-  tokens: CommentPair<string>;
-}>;
-
-/**
- * Description of statement as the callback handlers and a sequence of tokens.
- */
-type Statement<Context> = Readonly<{
-  /**
-   * If `true`, then we parse comments inside the statement (between its parts).
-   */
-  canIncludeComments: boolean;
-  onError?: OnParse<Context>;
-  onParse?: OnParse<Context>;
-  tokens: readonly [string, ...string[]];
-}>;

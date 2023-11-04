@@ -293,6 +293,7 @@ export const createParseFunction = <Context>(options: Options<Context>): Parse<C
 };
 
 export type {
+  Comment,
   CommentPair,
   OnCommentError,
   OnCommentParse,
@@ -301,6 +302,7 @@ export type {
   Options,
   Parse,
   ParsedToken,
+  Statement,
 } from './types';
 
 /**
