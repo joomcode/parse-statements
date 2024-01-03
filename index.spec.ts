@@ -37,7 +37,9 @@ emptyParse({}, '');
 emptyParse({}, 'foo');
 
 try {
-  createParseFunction({statements: [{canIncludeComments: true, tokens: ['}']}]});
+  createParseFunction({
+    statements: [{canIncludeComments: true, tokens: ['}'], shouldSearchBeforeComments: true}],
+  });
   throwError('Unexpected error');
 } catch (error) {
   assert(error instanceof SyntaxError, 'throws SyntaxError for invalid regexp');
@@ -139,6 +141,7 @@ const parseImportsExports = createParseFunction<Context>({
       onError,
       onParse: onImportParse as OnParse,
       tokens: ['^import ', '[\'"];?$'],
+      shouldSearchBeforeComments: true,
     },
     {
       canIncludeComments: true,
@@ -148,6 +151,7 @@ const parseImportsExports = createParseFunction<Context>({
         '^export ',
         '(\\bconst (?<constName>[\\w_$][\\w_$\\d]*)\\b)|("[^"]*";?$\\n?)|(\'[^\']*\';?$\\n?)',
       ],
+      shouldSearchBeforeComments: true,
     },
   ],
 });
@@ -199,8 +203,8 @@ const errorParse = createParseFunction<[string, number][]>({
     context.push([message, index]);
   },
   statements: [
-    {canIncludeComments: true, tokens: ['a)|b|(c']},
-    {canIncludeComments: true, tokens: ['d', 'e)|f|(g']},
+    {canIncludeComments: true, tokens: ['a)|b|(c'], shouldSearchBeforeComments: true},
+    {canIncludeComments: true, tokens: ['d', 'e)|f|(g'], shouldSearchBeforeComments: true},
   ],
 });
 
@@ -260,6 +264,7 @@ const parseWithComments = createParseFunction<string[]>({
         );
       }) as OnParse,
       tokens: ['a', 'b', 'c'],
+      shouldSearchBeforeComments: true,
     },
   ],
 });
@@ -286,6 +291,7 @@ const parseWithoutComments = createParseFunction<string[]>({
       canIncludeComments: false,
       onError: () => throwError('Statement error'),
       tokens: ['a', 'b', 'c'],
+      shouldSearchBeforeComments: true,
     },
   ],
 });
@@ -297,6 +303,39 @@ parseWithoutComments(withoutCommentsContext, ' <comment> a <foo> b<bar>c <baz>')
 assert(
   withoutCommentsContext.join('|') === 'comment|baz',
   'does not parse comments inside statement with `canIncludeComments = false`',
+);
+
+const parseAfterComments = createParseFunction<string[]>({
+  comments: [
+    {
+      onError: () => throwError('Comment error'),
+      onParse: (context, source, {end}, {start}) => {
+        context.push(source.slice(end, start));
+      },
+      tokens: ['aa', 'aa'],
+    },
+  ],
+  onError: (_context, _source, message) => throwError(message),
+  statements: [
+    {
+      canIncludeComments: true,
+      onError: () => throwError('Statement error'),
+      onParse: ((context, source, {end}, {start}) => {
+        context.push(source.slice(end, start));
+      }) as OnParse,
+      tokens: ['a', 'b'],
+      shouldSearchBeforeComments: false,
+    },
+  ],
+});
+
+const afterComments: string[] = [];
+
+parseAfterComments(afterComments, 'aa some comment with a aa adb');
+
+assert(
+  afterComments.join('|') === ' some comment with a |d',
+  'parse statement after comment with `shouldSearchBeforeComments = false`',
 );
 
 const onMultilineExportParse: OnParse<Context, 2> = ({exports}, source, exportStart, exportEnd) => {
@@ -335,6 +374,7 @@ const parseExports = createParseFunction<Context>({
       onError,
       onParse: onMultilineExportParse as OnParse,
       tokens: ['^export \\{', '$'],
+      shouldSearchBeforeComments: true,
     },
   ],
 });

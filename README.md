@@ -122,6 +122,7 @@ const parseImportsExports = createParseFunction<Context>({
       onError: onCommentError,
       onParse: onCommentParse,
       tokens: ['\\/\\/', '$\\n?'],
+      shouldSearchBeforeComments: true,
     },
     {
       canIncludeComments: true,
@@ -130,6 +131,7 @@ const parseImportsExports = createParseFunction<Context>({
         multilineComments.push(source.slice(end, start));
       },
       tokens: ['\\/\\*', '\\*\\/'],
+      shouldSearchBeforeComments: true,
     },
   ],
   onError: (_context, _source, message) => throwError(message),

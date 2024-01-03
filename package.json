@@ -1,12 +1,12 @@
 {
   "name": "parse-statements",
-  "version": "1.0.7",
+  "version": "1.0.8",
   "description": "Fast and easy parser of statements in source code in any language ✂️",
   "author": "uid11",
   "bugs": "https://github.com/joomcode/parse-statements/issues",
   "devDependencies": {
-    "prettier": ">=3",
-    "typescript": ">=5.2"
+    "prettier": ">=3.1",
+    "typescript": ">=5.3"
   },
   "exports": {
     ".": "./index.js"
@@ -25,7 +25,7 @@
     "statement"
   ],
   "license": "MIT",
-  "packageManager": "npm@9",
+  "packageManager": "npm@10",
   "repository": {
     "type": "git",
     "url": "https://github.com/joomcode/parse-statements"

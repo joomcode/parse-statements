@@ -156,6 +156,10 @@ export type Statement<Context> = Readonly<{
   onError?: OnParse<Context>;
   onParse?: OnParse<Context>;
   tokens: readonly [string, ...string[]];
+  /**
+   * If `true`, then the statement token is searched before the comment tokens, otherwise after.
+   */
+  shouldSearchBeforeComments: boolean;
 }>;
 
 /**

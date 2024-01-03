@@ -18,6 +18,7 @@ export const getPreparedOptions = <Context>({
 }: Options<Context>): PreparedOptions<Context> => {
   const commentsKeys: Key[] = [];
   const firstTokens: TokenWithKey[] = [];
+  const firstTokensAfterComments: TokenWithKey[] = [];
   let keyIndex = 1;
   const openTokens: TokenWithKey[] = [];
   const preparedComments = {__proto__: null} as unknown as Record<Key, PreparedComment<Context>>;
@@ -46,19 +47,26 @@ export const getPreparedOptions = <Context>({
     onError,
     onParse,
     tokens: [firstToken, ...restTokens],
+    shouldSearchBeforeComments,
   } of statements) {
     const statementKey: Key = `parseStatementsPackageStatement${keyIndex++}`;
     const tokens: PreparedToken[] = [];
 
-    firstTokens.push([statementKey, firstToken]);
+    (shouldSearchBeforeComments ? firstTokens : firstTokensAfterComments).push([
+      statementKey,
+      firstToken,
+    ]);
     statementsKeys.push(statementKey);
 
     for (const nextToken of restTokens) {
       const nextTokenKey: Key = `parseStatementsPackageStatementPart${keyIndex++}`;
-      const nextTokenRegExp = createRegExp(
-        [nextTokenKey, nextToken],
-        ...(canIncludeComments ? openTokens : emptyTokens),
-      );
+      const regexpTokens: TokenWithKey[] = [[nextTokenKey, nextToken]];
+
+      if (canIncludeComments) {
+        regexpTokens[shouldSearchBeforeComments ? 'push' : 'unshift'](...openTokens);
+      }
+
+      const nextTokenRegExp = createRegExp(...regexpTokens);
 
       tokens.push({nextTokenKey, nextTokenRegExp});
     }
@@ -66,7 +74,11 @@ export const getPreparedOptions = <Context>({
     preparedStatements[statementKey] = {onError, onParse, tokens};
   }
 
-  const nextStatementRegExp = createRegExp(...firstTokens, ...openTokens);
+  const nextStatementRegExp = createRegExp(
+    ...firstTokens,
+    ...openTokens,
+    ...firstTokensAfterComments,
+  );
 
   return {
     commentsKeys,
@@ -99,8 +111,3 @@ const createRegExp = (...tokens: readonly TokenWithKey[]): RegExp => {
  * Empty regexp that match only the empty string.
  */
 const emptyRegExp = /^$/g;
-
-/**
- * Empty tokens array to skip comments into statements with `canIncludeComments` option.
- */
-const emptyTokens: readonly TokenWithKey[] = [];
