@@ -2,8 +2,17 @@
  * Description of comment as the callback handlers and open and close tokens.
  */
 export type Comment<Context> = Readonly<{
+  /**
+   * An optional callback handler for comment parsing errors.
+   */
   onError?: OnCommentError<Context>;
+  /**
+   * An optional callback handler of comment.
+   */
   onParse?: OnCommentParse<Context>;
+  /**
+   * Pair of the comment open and close raw tokens.
+   */
   tokens: CommentPair<string>;
 }>;
 
@@ -16,6 +25,14 @@ export type CommentPair<Token = ParsedToken> = readonly [open: Token, close: Tok
  * Key of regexp (name of named capturing groups).
  */
 export type Key = string;
+
+/**
+ * Returns a copy of the object type with mutable properties.
+ * `Mutable<{readonly foo: string}>` = `{foo: string}`.
+ */
+export type Mutable<Type> = {
+  -readonly [Key in keyof Type]: Type[Key];
+};
 
 /**
  * `onError` callback handler for error on comment parsing.
@@ -58,14 +75,6 @@ export type Options<Context> = Readonly<{
    */
   statements?: readonly Statement<Context>[];
 }>;
-
-/**
- * Returns a copy of the object type with mutable properties.
- * `Mutable<{readonly foo: string}>` = `{foo: string}`.
- */
-export type Mutable<Type> = {
-  -readonly [Key in keyof Type]: Type[Key];
-};
 
 /**
  * Parse function.
@@ -153,11 +162,20 @@ export type Statement<Context> = Readonly<{
    * If `true`, then we parse comments inside the statement (between its parts).
    */
   canIncludeComments: boolean;
+  /**
+   * An optional callback handler for statement parsing errors.
+   */
   onError?: OnParse<Context>;
+  /**
+   * An optional callback handler of statement.
+   */
   onParse?: OnParse<Context>;
+  /**
+   * Not-empty array of statement raw tokens.
+   */
   tokens: readonly [string, ...string[]];
   /**
-   * If `true`, then the statement token is searched before the comment tokens, otherwise after.
+   * If `true`, then the statement first token is searched before the comment tokens, otherwise after.
    */
   shouldSearchBeforeComments: boolean;
 }>;
