@@ -1,4 +1,4 @@
-import {getPreparedOptions} from './getPreparedOptions';
+import {getPreparedOptions} from './getPreparedOptions.js';
 
 import type {
   CommentPair,

@@ -1,3 +1,4 @@
+*.cjs
 *.d.ts
 *.js
 node_modules

@@ -1,18 +1,24 @@
 {
   "name": "parse-statements",
-  "version": "1.0.9",
+  "version": "1.0.10",
   "description": "Fast and easy parser of statements in source code in any language ✂️",
   "author": "uid11",
   "bugs": "https://github.com/joomcode/parse-statements/issues",
   "devDependencies": {
-    "prettier": ">=3.1",
-    "typescript": ">=5.3"
+    "prettier": ">=3.4",
+    "typescript": ">=5.7"
   },
   "exports": {
-    ".": "./index.js"
+    ".": {
+      "import": "./index.js",
+      "require": "./index.cjs",
+      "types": "./index.d.ts"
+    }
   },
   "files": [
+    "getPreparedOptions.cjs",
     "getPreparedOptions.js",
+    "index.cjs",
     "index.js",
     "index.d.ts",
     "types.d.ts"
@@ -31,12 +37,14 @@
     "url": "https://github.com/joomcode/parse-statements"
   },
   "scripts": {
-    "prebuild": "rm -f *.js *.d.ts",
+    "prettier": "prettier --cache --cache-strategy=content --write .",
+    "prebuild": "rm -f *.cjs *.js *.d.ts",
     "build": "tsc",
-    "prettier": "prettier --cache --cache-strategy=content --write . !package-lock.json",
+    "postbuild": "node ./convertEsmToCjs.js",
     "test": "export _START=$(date +%s%3N) && npm run prettier && npm run build && node ./index.spec.js",
     "prepublishOnly": "npm test"
   },
   "sideEffects": false,
+  "type": "module",
   "types": "index.d.ts"
 }

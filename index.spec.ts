@@ -1,4 +1,4 @@
-import {createParseFunction} from './index';
+import {createParseFunction} from './index.js';
 
 import type {OnCommentError, OnCommentParse, OnParse} from './index';
 
