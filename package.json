@@ -34,7 +34,7 @@
   "packageManager": "npm@10",
   "repository": {
     "type": "git",
-    "url": "https://github.com/joomcode/parse-statements"
+    "url": "git+https://github.com/joomcode/parse-statements.git"
   },
   "scripts": {
     "prettier": "prettier --cache --cache-strategy=content --write .",
