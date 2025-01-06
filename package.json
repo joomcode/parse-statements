@@ -1,6 +1,6 @@
 {
   "name": "parse-statements",
-  "version": "1.0.10",
+  "version": "1.0.11",
   "description": "Fast and easy parser of statements in source code in any language ✂️",
   "author": "uid11",
   "bugs": "https://github.com/joomcode/parse-statements/issues",
@@ -46,5 +46,5 @@
   },
   "sideEffects": false,
   "type": "module",
-  "types": "index.d.ts"
+  "types": "./index.d.ts"
 }
