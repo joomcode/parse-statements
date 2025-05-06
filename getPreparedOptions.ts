@@ -14,6 +14,7 @@ import type {
 export const getPreparedOptions = <Context>({
   comments = [],
   onError,
+  regexpFlags = 'gmu',
   statements = [],
 }: Options<Context>): PreparedOptions<Context> => {
   const commentsKeys: Key[] = [];
@@ -33,7 +34,7 @@ export const getPreparedOptions = <Context>({
     onParse,
     tokens: [open, close],
   } of comments) {
-    const closeRegExp = createRegExp(['', close]);
+    const closeRegExp = createRegExp(regexpFlags, ['', close]);
     const key: Key = `parseStatementsPackageComment${keyIndex++}`;
 
     commentsKeys.push(key);
@@ -66,7 +67,7 @@ export const getPreparedOptions = <Context>({
         regexpTokens[shouldSearchBeforeComments ? 'push' : 'unshift'](...openTokens);
       }
 
-      const nextTokenRegExp = createRegExp(...regexpTokens);
+      const nextTokenRegExp = createRegExp(regexpFlags, ...regexpTokens);
 
       tokens.push({nextTokenKey, nextTokenRegExp});
     }
@@ -75,6 +76,7 @@ export const getPreparedOptions = <Context>({
   }
 
   const nextStatementRegExp = createRegExp(
+    regexpFlags,
     ...firstTokens,
     ...openTokens,
     ...firstTokensAfterComments,
@@ -93,7 +95,7 @@ export const getPreparedOptions = <Context>({
 /**
  * Creates regexp by tokens.
  */
-const createRegExp = (...tokens: readonly TokenWithKey[]): RegExp => {
+const createRegExp = (flags: string, ...tokens: readonly TokenWithKey[]): RegExp => {
   if (!tokens[0]) {
     return emptyRegExp;
   }
@@ -104,7 +106,7 @@ const createRegExp = (...tokens: readonly TokenWithKey[]): RegExp => {
     source = tokens.map(([key, token]) => `(?<${key}>${token})`).join('|');
   }
 
-  return new RegExp(source, 'gmu');
+  return new RegExp(source, flags);
 };
 
 /**

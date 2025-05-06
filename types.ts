@@ -71,6 +71,10 @@ export type Options<Context> = Readonly<{
    */
   onError?: OnGlobalError<Context>;
   /**
+   * An optional `RegExp` flags used to create all regexps. Defaults to `'gmu'`.
+   */
+  regexpFlags?: string;
+  /**
    * An optional array of statements as a non-empty array of tokens with optional callbacks.
    */
   statements?: readonly Statement<Context>[];

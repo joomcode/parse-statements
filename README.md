@@ -15,8 +15,9 @@ with arbitrary text between them. Statements cannot overlap.
 In addition to statements, language comments can be described, which can also be located
 inside statements (between its neighboring tokens).
 
-Strings are used to describe (find) tokens, from which regexps with `gmu` flags are generated
-(therefore, the backslash in these lines must be escaped, that is, it must be doubled).
+Strings are used to describe (find) tokens, from which regexps with `gmu` flags
+(by default, but can be overridden in the parser options) are generated.
+Therefore, the backslash in these lines must be escaped, that is, it must be doubled.
 
 For each parsed statement, the optional `onParse` callback is called with the context,
 source code (string), and an array of tokens of statement
@@ -210,7 +211,7 @@ const context: Context = ...;
 parse(context, 'some source code (as string)');
 ```
 
-The `options` object defines comments, statements, and a global error callback handler
+The `options` object defines comments, statements, `RegExp` flags and a global error callback handler
 (all of these fields are optional):
 
 ```ts
@@ -219,6 +220,7 @@ import type {Comment, OnGlobalError, Options, ParsedToken, Statement} from 'pars
 const options: Options<Context> = {
   comments, // an optional array of comments
   onError, // an optional callback handler for global parsing errors
+  regexpFlags: 'gmu', // an optional `RegExp` flags used to create all regexps (defaults to `'gmu'`)
   statements, // an optional array of statements
 };
 
